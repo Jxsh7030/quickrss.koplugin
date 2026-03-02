@@ -255,6 +255,7 @@ function QuickRSSUI:_fetch()
             -- Guard: if the user closed the UI while fetching, bail out.
             -- The cache is still saved so the next open picks up results.
             local AR = require("modules/data/images")
+            AR.resetHostTracking()
             local img_settings = Config.getArticleSettings()
 
             -- Carry over image_path from cached articles so we don't

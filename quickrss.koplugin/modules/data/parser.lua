@@ -18,20 +18,66 @@
 --                                                   content, image_url}, ... } }
 
 local Config     = require("modules/data/config")
-local https      = require("ssl.https")
-local ltn12      = require("ltn12")
 local logger     = require("logger")
 local NetworkMgr = require("ui/network/manager")
-local socketutil = require("socketutil")
 local util       = require("util")
 
 local Parser = {}
+
+-- ── Download backend detection ───────────────────────────────────────────────
+-- Prefer wget (external process, no FD accumulation in parent) over LuaSec
+-- (in-process SSL sockets that linger until GC and exhaust system-wide FDs
+-- on e-readers with low limits, causing DNS resolution failures).
+local WGET_AVAILABLE
+do
+    local ret = os.execute("wget --help >/dev/null 2>&1")
+    WGET_AVAILABLE = (ret == 0 or ret == true)
+    if WGET_AVAILABLE then
+        logger.dbg("QuickRSS parser: using wget for HTTP requests")
+    else
+        logger.dbg("QuickRSS parser: wget not found, using LuaSec")
+    end
+end
+
+-- Shell-quote a string for safe use inside single quotes.
+local function shellQuote(s)
+    return "'" .. s:gsub("'", "'\\''") .. "'"
+end
 
 -- ── _fetchRaw ─────────────────────────────────────────────────────────────────
 -- Synchronous HTTPS GET. Returns (body_string, nil) on success or
 -- (nil, error_string) on failure.  Must be called from within a
 -- NetworkMgr:runWhenOnline() closure.
-local function _fetchRaw(url)
+
+local function _fetchRawWget(url)
+    local tmpfile = os.tmpname()
+    local cmd = "wget -q -O " .. shellQuote(tmpfile)
+             .. " --timeout=30 --tries=2"
+             .. " -- " .. shellQuote(url)
+             .. " 2>/dev/null"
+    local ret = os.execute(cmd)
+    if ret ~= 0 and ret ~= true then
+        os.remove(tmpfile)
+        return nil, "wget failed for " .. url
+    end
+    local f = io.open(tmpfile, "rb")
+    if not f then
+        os.remove(tmpfile)
+        return nil, "failed to read wget output"
+    end
+    local body = f:read("*a")
+    f:close()
+    os.remove(tmpfile)
+    if not body or body == "" then
+        return nil, "empty response from " .. url
+    end
+    return body, nil
+end
+
+local function _fetchRawLuaSec(url)
+    local https      = require("ssl.https")
+    local ltn12      = require("ltn12")
+    local socketutil = require("socketutil")
     local sink = {}
     socketutil:set_timeout(
         socketutil.LARGE_BLOCK_TIMEOUT,
@@ -41,7 +87,6 @@ local function _fetchRaw(url)
         url  = url,
         sink = ltn12.sink.table(sink),
     }
-    -- Always restore defaults so other KOReader code isn't affected.
     socketutil:reset_timeout()
 
     if not ok then return nil, tostring(code) end
@@ -49,6 +94,14 @@ local function _fetchRaw(url)
         return nil, "HTTP " .. tostring(code) .. " – " .. tostring(status)
     end
     return table.concat(sink), nil
+end
+
+local function _fetchRaw(url)
+    if WGET_AVAILABLE then
+        return _fetchRawWget(url)
+    else
+        return _fetchRawLuaSec(url)
+    end
 end
 
 -- ── Full-text helpers ─────────────────────────────────────────────────────────
