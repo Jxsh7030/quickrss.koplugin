@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.0">
+  <head><title>QuickRSS Feeds</title></head>
+  <body>
+    <outline text="Ars Technica" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/index"/>
+    <outline text="Hackaday" type="rss" xmlUrl="https://hackaday.com/blog/feed/"/>
+    <outline text="Science Daily - Science" type="rss" xmlUrl="https://www.sciencedaily.com/rss/top/science.xml"/>
+  </body>
+</opml>
