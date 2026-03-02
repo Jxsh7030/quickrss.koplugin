@@ -529,12 +529,21 @@ function QuickRSSUI:_populateItems()
             art_settings = art_settings,
             -- Tap opens the article in the HTML reader.
             callback = function(article)
-                local ArticleReader = require("modules/ui/article_reader")
-                UIManager:show(ArticleReader:new{
-                    article       = article,
-                    articles      = articles,
-                    article_index = i,
-                })
+                local InfoMessage = require("ui/widget/infomessage")
+                local msg = InfoMessage:new{
+                    text = _("Opening ") .. article.title,
+                    timeout = 30,
+                }
+                UIManager:show(msg)
+                UIManager:nextTick(function()
+                    local ArticleReader = require("modules/ui/article_reader")
+                    UIManager:show(ArticleReader:new{
+                        article       = article,
+                        articles      = articles,
+                        article_index = i,
+                    })
+                    UIManager:close(msg)
+                end)
             end,
         }
         table.insert(self.article_list, item)
@@ -587,6 +596,12 @@ function QuickRSSUI:onSwipe(_, ges_ev)
     elseif ges_ev.direction == "east" then
         self:prevPage()
         return true
+    elseif ges_ev.direction == "northeast"
+        or ges_ev.direction == "northwest"
+        or ges_ev.direction == "southeast"
+        or ges_ev.direction == "southwest" then
+        UIManager:setDirty(nil, "full", nil, true)
+        return false
     end
 end
 

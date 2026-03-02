@@ -388,6 +388,12 @@ function ArticleReader:onSwipe(_, ges_ev)
     elseif ges_ev.direction == "east" then
         self:_navigateTo(self.article_index - 1)
         return true
+    elseif ges_ev.direction == "northeast"
+        or ges_ev.direction == "northwest"
+        or ges_ev.direction == "southeast"
+        or ges_ev.direction == "southwest" then
+        UIManager:setDirty(nil, "full", nil, true)
+        return false
     end
 end
 
