@@ -16,7 +16,7 @@ local ltn12       = require("ltn12")
 local https       = require("ssl.https")
 local socketutil  = require("socketutil")
 
-local IMAGE_DIR = DataStorage:getSettingsDir() .. "/quickrss_images"
+local IMAGE_DIR = DataStorage:getDataDir() .. "/quickrss/images"
 lfs.mkdir(IMAGE_DIR)  -- no-op if already exists
 
 -- Non-cryptographic hash → stable 8-char hex filename prefix.

@@ -14,7 +14,7 @@ local lfs         = require("libs/libkoreader-lfs")
 local LuaSettings = require("luasettings")
 local logger      = require("logger")
 
-local CACHE_FILE = DataStorage:getSettingsDir() .. "/quickrss_cache.lua"
+local CACHE_FILE = DataStorage:getDataDir() .. "/quickrss/cache.lua"
 local IMAGE_DIR  = Images.IMAGE_DIR
 
 local _settings

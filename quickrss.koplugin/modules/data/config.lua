@@ -2,9 +2,11 @@
 -- Persists the user's feed list and article-limit settings to a dedicated
 -- settings file.
 --
--- Feed list is stored as a standard OPML file (quickrss_feeds.opml) so it
+-- Feed list is stored as a standard OPML file (feeds.opml) so it
 -- can be edited on a computer or imported from another RSS reader.
--- All other settings (article limits, reader prefs) live in quickrss.lua.
+-- All other settings (article limits, reader prefs) live in settings.lua.
+--
+-- All data lives under <koreader data dir>/quickrss/
 --
 -- Public API:
 --   Config.getFeeds()                    → { { name, url }, … }
@@ -15,10 +17,13 @@
 --   Config.saveReaderSettings(s)         saves and flushes to disk
 
 local DataStorage = require("datastorage")
+local lfs         = require("libs/libkoreader-lfs")
 local LuaSettings = require("luasettings")
 local OPML        = require("modules/data/opml")
 
-local SETTINGS_FILE = DataStorage:getSettingsDir() .. "/quickrss.lua"
+local BASE_DIR      = DataStorage:getDataDir() .. "/quickrss"
+lfs.mkdir(BASE_DIR)  -- no-op if already exists
+local SETTINGS_FILE = BASE_DIR .. "/settings.lua"
 
 -- Shown the first time the plugin is opened before the user adds their own feeds
 local DEFAULT_FEEDS = {

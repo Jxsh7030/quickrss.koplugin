@@ -3,8 +3,8 @@
 -- manage their subscriptions from a computer (text editor, another RSS
 -- reader, etc.) without touching the device UI.
 --
--- The file is stored alongside the other plugin data files:
---   <koreader settings dir>/quickrss_feeds.opml
+-- The file is stored in the dedicated plugin data directory:
+--   <koreader data dir>/quickrss/feeds.opml
 --
 -- Public API:
 --   OPML.read([path])          → { {name, url}, … }  or nil if file missing
@@ -14,7 +14,7 @@
 local DataStorage = require("datastorage")
 local logger      = require("logger")
 
-local OPML_FILE = DataStorage:getSettingsDir() .. "/quickrss_feeds.opml"
+local OPML_FILE = DataStorage:getDataDir() .. "/quickrss/feeds.opml"
 
 local OPML = {}
 

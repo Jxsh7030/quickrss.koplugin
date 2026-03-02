@@ -39,7 +39,7 @@ A fast, standalone and easy to use RSS reader plugin for [KOReader](https://gith
 
 **OPML support**
 - Feeds are stored as a .opml file
-- Can be edited from a computer (`koreader/settings/quickrss_feeds.opml`) or directly from the UI (**≡** → **Feeds**)
+- Can be edited from a computer (`koreader/quickrss/feeds.opml`) or directly from the UI (**≡** → **Feeds**)
 
 ## Installation
 
@@ -86,7 +86,7 @@ Tap **≡** → **Settings** to configure:
 | Setting | Default | Description |
 |---|---|---|
 | Items per feed | 20 | Maximum articles fetched per feed |
-| Cache max age | 30 days | How long before the cache is treated as empty (0 = never expire) |
+| Cache max age | 10 days | How long before the cache is treated as empty (0 = never expire) |
 | Thumbnail images | On | Enable/disable thumbnail images in the feed list |
 | Article images | On | Enable/disable images inside articles |
 | Card font size | 14 | Font size for article cards in the feed list |
@@ -128,21 +128,21 @@ quickrss.koplugin/
 
 ## Data storage
 
-All data is stored inside KOReader's **settings** subdirectory (not the KOReader root):
+All plugin data is stored in a dedicated `quickrss/` directory inside the KOReader data root:
 
-| Platform | Settings directory |
+| Platform | Data directory |
 |---|---|
-| Linux desktop | `~/.config/koreader/settings/` |
-| Kindle | `/mnt/us/extensions/koreader/settings/` |
-| Kobo | `.adds/koreader/settings/` |
-| PocketBook | `applications/koreader/settings/` |
+| Linux desktop | `~/.config/koreader/quickrss/` |
+| Kindle | `/mnt/us/extensions/koreader/quickrss/` |
+| Kobo | `.adds/koreader/quickrss/` |
+| PocketBook | `applications/koreader/quickrss/` |
 
 | File / Directory | Contents |
 |---|---|
-| `quickrss_feeds.opml` | Feed list (OPML — edit this on your computer) |
-| `quickrss.lua` | Article and reader settings |
-| `quickrss_cache.lua` | Cached article list and last-fetched timestamp |
-| `quickrss_images/` | Downloaded article images and thumbnails |
+| `feeds.opml` | Feed list (OPML — edit this on your computer) |
+| `settings.lua` | Article and reader settings |
+| `cache.lua` | Cached article list and last-fetched timestamp |
+| `images/` | Downloaded article images and thumbnails |
 
 ### Editing feeds on a computer
 
@@ -160,4 +160,4 @@ The feed list is stored as a standard OPML file. You can edit it directly in any
 </opml>
 ```
 
-Copy the file to the **settings** directory listed above (the same folder where `quickrss.lua` is created) and the plugin will pick it up on the next open. Changes made through the in-device UI are written back to the same file automatically.
+Copy the file to the `quickrss/` directory listed above and the plugin will pick it up on the next open. Changes made through the in-device UI are written back to the same file automatically.
