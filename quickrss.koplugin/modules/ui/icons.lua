@@ -11,4 +11,5 @@ return {
     BOOK     = "\u{f02d}",  -- 📖 open book  (article reader, future use)
     INFO     = "\u{f05a}",  -- ℹ  info circle
     FILTER   = "\u{f0b0}",  -- 🔽 funnel / filter
+    COPY     = "\u{f0c5}",  -- 📋 clipboard / copy
 }
