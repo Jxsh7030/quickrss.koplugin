@@ -22,6 +22,7 @@ local HorizontalSpan   = require("ui/widget/horizontalspan")
 local Images           = require("modules/data/images")
 local InputContainer   = require("ui/widget/container/inputcontainer")
 local LineWidget       = require("ui/widget/linewidget")
+local QRMessage        = require("ui/widget/qrmessage")
 local ScrollHtmlWidget = require("ui/widget/scrollhtmlwidget")
 local Size             = require("ui/size")
 local TitleBar         = require("ui/widget/titlebar")
@@ -329,6 +330,9 @@ function ArticleReader:init()
         height                  = self.scroll_h,
         dialog                  = self,
         html_resource_directory = IMAGE_DIR,
+        html_link_tapped_callback = function(link)
+            self:_onLinkTapped(link)
+        end,
     })
     if nav_footer_widget then
         table.insert(self.layout_group, nav_footer_widget)
@@ -363,9 +367,22 @@ function ArticleReader:_applyPrefs(prefs)
         height                  = self.scroll_h,
         dialog                  = self,
         html_resource_directory = IMAGE_DIR,
+        html_link_tapped_callback = function(link)
+            self:_onLinkTapped(link)
+        end,
     }
     self.layout_group:resetLayout()
     UIManager:setDirty(self, function() return "full", self.dimen end)
+end
+
+function ArticleReader:_onLinkTapped(link)
+    if link and link.uri and link.uri:match("^https?://") then
+        UIManager:show(QRMessage:new{
+            text   = link.uri,
+            width  = Screen:getWidth(),
+            height = Screen:getHeight(),
+        })
+    end
 end
 
 function ArticleReader:onClose()
